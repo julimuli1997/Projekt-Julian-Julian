@@ -1,0 +1,68 @@
+#----------------------Datenbank------------------------
+#1 Cases -> Seriennummer, klarnamen, größe, farbe, status, Preis
+
+#2 Grafikarten -> Seriennummer, klarnamen, größe, status, Preis
+
+#3 Prozessoren -> Seriennummer, klarnamen, status, Preis
+
+#4 Mainboards -> Seriennummer, klarnamen, status, größem, Preis
+
+#5 Arbeitsspeicher -> Seriennummer, klarnamen, Speichergröße, status, Preis
+
+#6 Festplatten -> Seriennummer, klarnamen, speichergröße, status, Preis
+
+#7 Netzteile -> Seriennummer, klarnamen, leistung, status, Preis
+
+#8 Kühler -> Seriennummer, klarnamen, typ, status, Preis
+
+#9 Zubehör -> Seriennummer, klarnamen, typ, status, Preis
+
+#---------------------Datenbank ende-----------------------
+
+#----------------------Backend------------------------
+#1 Datenbank verbindung herstellen
+#2 Datenbank abfragen
+#3 Datenbank daten einfügen
+#4 Datenbank daten löschen
+#5 Datenbank daten updaten
+#---------------------Backend ende-----------------------
+
+#---------------------Features------------------------
+#1 PC zusammenstellen
+#2 PC konfiguration speichern
+#3 PC konfiguration laden
+#4 PC konfiguration löschen
+#5 PC konfiguration bearbeiten
+#6 PC konfiguration anzeigen
+#7 PC konfiguration Preis berechnen
+#---------------------Features ende-----------------------
+
+#---------------------Modell------------------------
+#1 Case klasse
+#2 Grafikarten klasse
+#3 Prozessoren klasse
+#4 Mainboards klasse
+#5 Arbeitsspeicher klasse
+#6 Festplatten klasse
+#7 Netzteile klasse
+#8 Kühler klasse
+#9 Zubehör klasse
+#10 PC klasse
+#---------------------Modell ende-----------------------
+
+#---------------------Frontend------------------------
+#1 Welcome screen
+#2 Main menu
+#3 PC zusammenstellen screen
+#4 Suchzeile überall
+#5 Produkt anzeigen screen
+#6 PC konfiguration screen (anzeigen, bearbeiten, löschen)
+#---------------------Frontend ende-----------------------
+
+#---------------------Controller------------------------
+#1 Verbindung zwischen Frontend und Backend
+#2 Verbindung zwischen Frontend und Modell
+#3 Verbindung zwischen Backend und Modell
+#---------------------Controller ende-----------------------
+
+#---------------------Variablen------------------------
