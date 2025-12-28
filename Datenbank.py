@@ -4,8 +4,8 @@ from mysql.connector import Error
 def get_connection(): #Stzellt die Verbindung zur Datenbank her:
     return mysql.connector.connect( #Verbindungsparameter zur Datenbank
         host='localhost', #Datenbank-Host
-        user="root", #Datenbank-Benutzername
-        password="RBeCS$oiQ8s9RUo", #Datenbank-Passwort
+        user="admin", #Datenbank-Benutzername
+        password="xQrYP2ttqX*w5%P", #Datenbank-Passwort
         database="projekt" #Datenbank-Name
     )
 
