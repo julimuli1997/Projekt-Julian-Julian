@@ -1,6 +1,7 @@
 from Datenbank import get_connection #Stellt die Verbindung zur Datenbank her
 from Datenbank import execute #Importiert die allgemeine SQL-Funktion
 import csv
+import json
 
 # -------------------------------
 # Funktionen für Tabellen
@@ -27,6 +28,17 @@ def export_to_csv(table, filename=None): #Exportiert die Tabelle in eine CSV-Dat
         writer = csv.DictWriter(f, fieldnames=data[0].keys())
         writer.writeheader()
         writer.writerows(data)
+    print(f"{table} wurde erfolgreich nach {filename} exportiert.")
+
+def export_to_json(table, filename=None): #Exportiert die Tabelle in eine JSON-Datei:
+    if not filename:
+        filename = f"{table}.json"
+    data = export(table) #holt alle Einträge aus der Tabelle
+    if not data:
+        print(f"Die Tabelle '{table}' ist leer. Keine Daten zum Exportieren.")
+        return
+    with open(filename, "w", encoding='utf-8') as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
     print(f"{table} wurde erfolgreich nach {filename} exportiert.")
 
 
@@ -136,9 +148,16 @@ def export_all_to_csv():
     for table in tables:
         export_to_csv(table)
 
-
+def export_all_to_json():
+    tables = [
+        "cases", "grafikkarten", "prozessoren", "mainboards",
+        "arbeitsspeicher", "festplatten", "netzteile", "kuehler", "zubehoer"
+    ]
+    for table in tables:
+        export_to_json(table)
 
 # Ausführung der Funktion beim direkten Aufruf
 if __name__ == "__main__":
     fill_all()
     export_all_to_csv()
+    export_all_to_json()
