@@ -2,6 +2,26 @@ from Datenbank import get_connection #Stellt die Verbindung zur Datenbank her
 from Datenbank import execute #Importiert die allgemeine SQL-Funktion
 import csv
 import json
+from decimal import Decimal
+
+
+def convert_decimals(rows):
+    for row in rows:
+        for key, value in row.items():
+            if isinstance(value, Decimal):
+                row[key] = float(value)
+    return rows
+
+def export_to_json(table_name, filename):
+    rows = execute(f"SELECT * FROM {table_name}", fetch=True)
+    
+    if not rows:
+        print(f"Die Tabelle '{table_name}' ist leer. Keine Daten zum Exportieren.")
+        return
+    rows = convert_decimals(rows)
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(rows, f, indent=4, ensure_ascii=False)
+    print(f"{table_name} wurde erfolgreich nach {filename} exportiert.")
 
 # -------------------------------
 # Funktionen für Tabellen
@@ -29,18 +49,6 @@ def export_to_csv(table, filename=None): #Exportiert die Tabelle in eine CSV-Dat
         writer.writeheader()
         writer.writerows(data)
     print(f"{table} wurde erfolgreich nach {filename} exportiert.")
-
-def export_to_json(table, filename=None): #Exportiert die Tabelle in eine JSON-Datei:
-    if not filename:
-        filename = f"{table}.json"
-    data = export(table) #holt alle Einträge aus der Tabelle
-    if not data:
-        print(f"Die Tabelle '{table}' ist leer. Keine Daten zum Exportieren.")
-        return
-    with open(filename, "w", encoding='utf-8') as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
-    print(f"{table} wurde erfolgreich nach {filename} exportiert.")
-
 
 def update(table, key_column, key_value, updates: dict): #Aktualisiert einen Eintrag in der Tabelle:
     set_clause = ", ".join([f"{k}=%s" for k in updates]) 
@@ -148,14 +156,6 @@ def export_all_to_csv():
     for table in tables:
         export_to_csv(table)
 
-def export_all_to_json():
-    tables = [
-        "cases", "grafikkarten", "prozessoren", "mainboards",
-        "arbeitsspeicher", "festplatten", "netzteile", "kuehler", "zubehoer"
-    ]
-    for table in tables:
-        export_to_json(table)
-
 #Funktionen zum Anzeigen der Daten
 def show_all():
     tables = {
@@ -206,4 +206,12 @@ def make_pc_config(filename="pc_konfiguration.json", selection=None):
 if __name__ == "__main__":
     fill_all()
     export_all_to_csv()
-    export_all_to_json()
+    export_to_json("cases", "cases.json")
+    export_to_json("grafikkarten", "grafikkarten.json")
+    export_to_json("prozessoren", "prozessoren.json")
+    export_to_json("mainboards", "mainboards.json")
+    export_to_json("arbeitsspeicher", "arbeitsspeicher.json")
+    export_to_json("festplatten", "festplatten.json")
+    export_to_json("netzteile", "netzteile.json")
+    export_to_json("kuehler", "kuehler.json")
+    export_to_json("zubehoer", "zubehoer.json")
