@@ -1,0 +1,34 @@
+[
+    {
+        "id": 1,
+        "seriennummer": "RAM001",
+        "klarnamen": "Corsair Vengeance",
+        "speichergroesse": "16GB",
+        "status": "Verfügbar",
+        "preis": 79.99
+    },
+    {
+        "id": 2,
+        "seriennummer": "RAM002",
+        "klarnamen": "G.Skill Trident Z",
+        "speichergroesse": "32GB",
+        "status": "Verfügbar",
+        "preis": 159.99
+    },
+    {
+        "id": 3,
+        "seriennummer": "RAM003",
+        "klarnamen": "Kingston Fury",
+        "speichergroesse": "16GB",
+        "status": "Verfügbar",
+        "preis": 89.99
+    },
+    {
+        "id": 4,
+        "seriennummer": "RAM004",
+        "klarnamen": "Crucial Ballistix",
+        "speichergroesse": "32GB",
+        "status": "Verfügbar",
+        "preis": 149.99
+    }
+]

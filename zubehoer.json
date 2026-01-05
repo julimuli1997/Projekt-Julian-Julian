@@ -1,0 +1,34 @@
+[
+    {
+        "id": 1,
+        "seriennummer": "ZUB001",
+        "klarnamen": "RGB-Strip",
+        "typ": "Beleuchtung",
+        "status": "Verfügbar",
+        "preis": 29.99
+    },
+    {
+        "id": 2,
+        "seriennummer": "ZUB002",
+        "klarnamen": "Mauspad XXL",
+        "typ": "Peripherie",
+        "status": "Verfügbar",
+        "preis": 19.99
+    },
+    {
+        "id": 3,
+        "seriennummer": "ZUB003",
+        "klarnamen": "Gaming-Tastatur",
+        "typ": "Peripherie",
+        "status": "Verfügbar",
+        "preis": 49.99
+    },
+    {
+        "id": 4,
+        "seriennummer": "ZUB004",
+        "klarnamen": "Monitorarm",
+        "typ": "Zubehör",
+        "status": "Verfügbar",
+        "preis": 39.99
+    }
+]

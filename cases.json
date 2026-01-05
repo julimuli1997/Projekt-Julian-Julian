@@ -1,0 +1,38 @@
+[
+    {
+        "id": 1,
+        "seriennummer": "CASE001",
+        "klarnamen": "NZXT H510",
+        "groesse": "ATX",
+        "farbe": "Schwarz",
+        "status": "Verfügbar",
+        "preis": 89.99
+    },
+    {
+        "id": 2,
+        "seriennummer": "CASE002",
+        "klarnamen": "Corsair 4000D",
+        "groesse": "ATX",
+        "farbe": "Weiß",
+        "status": "Verfügbar",
+        "preis": 79.99
+    },
+    {
+        "id": 3,
+        "seriennummer": "CASE003",
+        "klarnamen": "Meshify C",
+        "groesse": "ATX",
+        "farbe": "Schwarz",
+        "status": "Verfügbar",
+        "preis": 99.99
+    },
+    {
+        "id": 4,
+        "seriennummer": "CASE004",
+        "klarnamen": "MasterBox",
+        "groesse": "ATX",
+        "farbe": "Blau",
+        "status": "Verfügbar",
+        "preis": 69.99
+    }
+]

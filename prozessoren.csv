@@ -1,0 +1,5 @@
+id,seriennummer,klarnamen,status,preis
+1,CPU001,Intel i7-12700K,Verfügbar,399.99
+2,CPU002,Intel i9-12900K,Verfügbar,599.99
+3,CPU003,Ryzen 7 5800X,Verfügbar,349.99
+4,CPU004,Ryzen 9 5900X,Verfügbar,499.99

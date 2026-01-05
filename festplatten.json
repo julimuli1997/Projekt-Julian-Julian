@@ -1,0 +1,34 @@
+[
+    {
+        "id": 1,
+        "seriennummer": "HDD001",
+        "klarnamen": "Samsung 970 EVO",
+        "speichergroesse": "1TB",
+        "status": "Verfügbar",
+        "preis": 109.99
+    },
+    {
+        "id": 2,
+        "seriennummer": "HDD002",
+        "klarnamen": "WD Blue SN550",
+        "speichergroesse": "1TB",
+        "status": "Verfügbar",
+        "preis": 89.99
+    },
+    {
+        "id": 3,
+        "seriennummer": "HDD003",
+        "klarnamen": "Crucial MX500",
+        "speichergroesse": "500GB",
+        "status": "Verfügbar",
+        "preis": 59.99
+    },
+    {
+        "id": 4,
+        "seriennummer": "HDD004",
+        "klarnamen": "Seagate Barracuda",
+        "speichergroesse": "2TB",
+        "status": "Verfügbar",
+        "preis": 79.99
+    }
+]

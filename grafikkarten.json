@@ -1,0 +1,34 @@
+[
+    {
+        "id": 1,
+        "seriennummer": "GPU001",
+        "klarnamen": "RTX 4070",
+        "groesse": "Groß",
+        "status": "Verfügbar",
+        "preis": 649.99
+    },
+    {
+        "id": 2,
+        "seriennummer": "GPU002",
+        "klarnamen": "RTX 4080",
+        "groesse": "Groß",
+        "status": "Verfügbar",
+        "preis": 1199.99
+    },
+    {
+        "id": 3,
+        "seriennummer": "GPU003",
+        "klarnamen": "RX 7900 XT",
+        "groesse": "Groß",
+        "status": "Verfügbar",
+        "preis": 899.99
+    },
+    {
+        "id": 4,
+        "seriennummer": "GPU004",
+        "klarnamen": "GTX 1660",
+        "groesse": "Mittel",
+        "status": "Verfügbar",
+        "preis": 249.99
+    }
+]

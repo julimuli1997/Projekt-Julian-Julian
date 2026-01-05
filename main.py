@@ -158,6 +158,7 @@ def export_all_to_csv():
         export_to_csv(table)
 
 #Funktionen zum Anzeigen der Daten
+
 def show_all():
     tables = {
         "cases": "cases",

@@ -1,0 +1,34 @@
+[
+    {
+        "id": 1,
+        "seriennummer": "PSU001",
+        "klarnamen": "Corsair RM750",
+        "leistung": "750W",
+        "status": "Verfügbar",
+        "preis": 129.99
+    },
+    {
+        "id": 2,
+        "seriennummer": "PSU002",
+        "klarnamen": "Seasonic GX650",
+        "leistung": "650W",
+        "status": "Verfügbar",
+        "preis": 119.99
+    },
+    {
+        "id": 3,
+        "seriennummer": "PSU003",
+        "klarnamen": "BeQuiet 750W",
+        "leistung": "750W",
+        "status": "Verfügbar",
+        "preis": 139.99
+    },
+    {
+        "id": 4,
+        "seriennummer": "PSU004",
+        "klarnamen": "Cooler Master 650W",
+        "leistung": "650W",
+        "status": "Verfügbar",
+        "preis": 99.99
+    }
+]
