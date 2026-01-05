@@ -156,7 +156,53 @@ def export_all_to_json():
     for table in tables:
         export_to_json(table)
 
-# Ausführung der Funktion beim direkten Aufruf
+#Funktionen zum Anzeigen der Daten
+def show_all():
+    tables = {
+        "cases": "cases",
+        "grafikkarten": "grafikkarten",
+        "prozessoren": "prozessoren",
+        "mainboards": "mainboards",
+        "arbeitsspeicher": "arbeitsspeicher",
+        "festplatten": "festplatten",
+        "netzteile": "netzteile",
+        "kuehler": "kuehler",
+        "zubehoer": "zubehoer"
+        }
+    for name, table in tables.items():
+        print(f"\n--- {name} ---")
+        data = export(table)
+        if data:
+            for row in data:
+                print(row)
+
+def make_pc_config(filename="pc_konfiguration.json", selection=None):
+    # Standard-Konfiguration, falls keine Auswahl übergeben wird
+    if selection is None:
+        selection = {
+            "cases": "CASE001",
+            "prozessoren": "CPU001",
+            "grafikkarten": "GPU001",
+            "mainboards": "MB001",
+            "arbeitsspeicher": "RAM001",
+            "festplatten": "HDD001",
+            "netzteile": "PSU001",
+            "kuehler": "COOL001"
+        }
+
+    pc_list = []
+    for table, serial in selection.items():
+        # Holt das Bauteil anhand der Seriennummer aus der jeweiligen Tabelle
+        result = execute(f"SELECT * FROM {table} WHERE seriennummer=%s", (serial,), fetch=True)
+        if result:
+            pc_list.append(result[0])
+
+    # Speichert die zusammengestellte Liste als JSON-Datei
+    with open(filename, "w", encoding='utf-8') as f:
+        json.dump(pc_list, f, indent=4, ensure_ascii=False)
+    print(f"PC-Konfiguration wurde erfolgreich in '{filename}' gespeichert.")
+
+    
 if __name__ == "__main__":
     fill_all()
     export_all_to_csv()
