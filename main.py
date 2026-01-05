@@ -1,5 +1,6 @@
 from Datenbank import get_connection #Stellt die Verbindung zur Datenbank her
 from Datenbank import execute #Importiert die allgemeine SQL-Funktion
+import os
 import csv
 import json
 from decimal import Decimal
