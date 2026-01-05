@@ -1,7 +1,28 @@
 from Datenbank import get_connection #Stellt die Verbindung zur Datenbank her
 from Datenbank import execute #Importiert die allgemeine SQL-Funktion
+import os
 import csv
 import json
+from decimal import Decimal
+
+
+def convert_decimals(rows):
+    for row in rows:
+        for key, value in row.items():
+            if isinstance(value, Decimal):
+                row[key] = float(value)
+    return rows
+
+def export_to_json(table_name, filename):
+    rows = execute(f"SELECT * FROM {table_name}", fetch=True)
+    
+    if not rows:
+        print(f"Die Tabelle '{table_name}' ist leer. Keine Daten zum Exportieren.")
+        return
+    rows = convert_decimals(rows)
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(rows, f, indent=4, ensure_ascii=False)
+    print(f"{table_name} wurde erfolgreich nach {filename} exportiert.")
 
 # -------------------------------
 # Funktionen für Tabellen
@@ -29,18 +50,6 @@ def export_to_csv(table, filename=None): #Exportiert die Tabelle in eine CSV-Dat
         writer.writeheader()
         writer.writerows(data)
     print(f"{table} wurde erfolgreich nach {filename} exportiert.")
-
-def export_to_json(table, filename=None): #Exportiert die Tabelle in eine JSON-Datei:
-    if not filename:
-        filename = f"{table}.json"
-    data = export(table) #holt alle Einträge aus der Tabelle
-    if not data:
-        print(f"Die Tabelle '{table}' ist leer. Keine Daten zum Exportieren.")
-        return
-    with open(filename, "w", encoding='utf-8') as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
-    print(f"{table} wurde erfolgreich nach {filename} exportiert.")
-
 
 def update(table, key_column, key_value, updates: dict): #Aktualisiert einen Eintrag in der Tabelle:
     set_clause = ", ".join([f"{k}=%s" for k in updates]) 
@@ -148,16 +157,62 @@ def export_all_to_csv():
     for table in tables:
         export_to_csv(table)
 
-def export_all_to_json():
-    tables = [
-        "cases", "grafikkarten", "prozessoren", "mainboards",
-        "arbeitsspeicher", "festplatten", "netzteile", "kuehler", "zubehoer"
-    ]
-    for table in tables:
-        export_to_json(table)
+#Funktionen zum Anzeigen der Daten
+def show_all():
+    tables = {
+        "cases": "cases",
+        "grafikkarten": "grafikkarten",
+        "prozessoren": "prozessoren",
+        "mainboards": "mainboards",
+        "arbeitsspeicher": "arbeitsspeicher",
+        "festplatten": "festplatten",
+        "netzteile": "netzteile",
+        "kuehler": "kuehler",
+        "zubehoer": "zubehoer"
+        }
+    for name, table in tables.items():
+        print(f"\n--- {name} ---")
+        data = export(table)
+        if data:
+            for row in data:
+                print(row)
 
-# Ausführung der Funktion beim direkten Aufruf
+def make_pc_config(filename="pc_konfiguration.json", selection=None):
+    # Standard-Konfiguration, falls keine Auswahl übergeben wird
+    if selection is None:
+        selection = {
+            "cases": "CASE001",
+            "prozessoren": "CPU001",
+            "grafikkarten": "GPU001",
+            "mainboards": "MB001",
+            "arbeitsspeicher": "RAM001",
+            "festplatten": "HDD001",
+            "netzteile": "PSU001",
+            "kuehler": "COOL001"
+        }
+
+    pc_list = []
+    for table, serial in selection.items():
+        # Holt das Bauteil anhand der Seriennummer aus der jeweiligen Tabelle
+        result = execute(f"SELECT * FROM {table} WHERE seriennummer=%s", (serial,), fetch=True)
+        if result:
+            pc_list.append(result[0])
+
+    # Speichert die zusammengestellte Liste als JSON-Datei
+    with open(filename, "w", encoding='utf-8') as f:
+        json.dump(pc_list, f, indent=4, ensure_ascii=False)
+    print(f"PC-Konfiguration wurde erfolgreich in '{filename}' gespeichert.")
+
+    
 if __name__ == "__main__":
     fill_all()
     export_all_to_csv()
-    export_all_to_json()
+    export_to_json("cases", "cases.json")
+    export_to_json("grafikkarten", "grafikkarten.json")
+    export_to_json("prozessoren", "prozessoren.json")
+    export_to_json("mainboards", "mainboards.json")
+    export_to_json("arbeitsspeicher", "arbeitsspeicher.json")
+    export_to_json("festplatten", "festplatten.json")
+    export_to_json("netzteile", "netzteile.json")
+    export_to_json("kuehler", "kuehler.json")
+    export_to_json("zubehoer", "zubehoer.json")
