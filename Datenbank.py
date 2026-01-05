@@ -32,17 +32,22 @@ def get_connection():
         database='projekt'
     )
 
-def execute(conn, query):
-    cursor = conn.cursor()
-    cursor.execute(query)
+def execute(query, params=None, fetch=False):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(query, params)
+    result = cursor.fetchall() if fetch else None
     conn.commit()
     cursor.close()
+    conn.close()
+    return result
+
 
 def create_tables():
     conn = get_connection()
 
     # Cases
-    execute(conn, """
+    execute("""
     CREATE TABLE IF NOT EXISTS cases (
         id INT AUTO_INCREMENT PRIMARY KEY,
         seriennummer VARCHAR(50),
@@ -54,7 +59,7 @@ def create_tables():
     )
     """)
     # Grafikkarten
-    execute(conn, """
+    execute("""
     CREATE TABLE IF NOT EXISTS grafikkarten (
         id INT AUTO_INCREMENT PRIMARY KEY,
         seriennummer VARCHAR(50),
@@ -66,7 +71,7 @@ def create_tables():
     """)
 
     # Prozessoren
-    execute(conn, """
+    execute("""
     CREATE TABLE IF NOT EXISTS prozessoren (
         id INT AUTO_INCREMENT PRIMARY KEY,
         seriennummer VARCHAR(50),
@@ -77,7 +82,7 @@ def create_tables():
     """)
 
     # Mainboards
-    execute(conn, """
+    execute("""
     CREATE TABLE IF NOT EXISTS mainboards (
         id INT AUTO_INCREMENT PRIMARY KEY,
         seriennummer VARCHAR(50),
@@ -88,7 +93,7 @@ def create_tables():
     )
     """)
     # Arbeitsspeicher
-    execute(conn, """
+    execute("""
     CREATE TABLE IF NOT EXISTS arbeitsspeicher (
         id INT AUTO_INCREMENT PRIMARY KEY,
         seriennummer VARCHAR(50),
@@ -99,7 +104,7 @@ def create_tables():
     )
     """)
     #Festplatten
-    execute(conn, """
+    execute("""
     CREATE TABLE IF NOT EXISTS festplatten (
         id INT AUTO_INCREMENT PRIMARY KEY,
         seriennummer VARCHAR(50),
@@ -111,7 +116,7 @@ def create_tables():
     """)
 
     #Netzteile
-    execute(conn, """
+    execute("""
     CREATE TABLE IF NOT EXISTS netzteile (
         id INT AUTO_INCREMENT PRIMARY KEY,
         seriennummer VARCHAR(50),
@@ -123,7 +128,7 @@ def create_tables():
     """)
 
     #Kühler
-    execute(conn, """
+    execute("""
     CREATE TABLE IF NOT EXISTS kuehler (
         id INT AUTO_INCREMENT PRIMARY KEY,
         seriennummer VARCHAR(50),
@@ -135,7 +140,7 @@ def create_tables():
     """)
 
     #Zubehör
-    execute(conn, """
+    execute("""
     CREATE TABLE IF NOT EXISTS zubehoer (
         id INT AUTO_INCREMENT PRIMARY KEY,
         seriennummer VARCHAR(50) NOT NULL UNIQUE,
