@@ -1,139 +1,153 @@
 import mysql.connector
 from mysql.connector import Error
+import getpass
 
-def get_connection(): #Stzellt die Verbindung zur Datenbank her:
-    return mysql.connector.connect( #Verbindungsparameter zur Datenbank
-        host='92.117.125.124', #Datenbank-Host
-        user="admin", #Datenbank-Benutzername
-        password="xQrYP2ttqX*w5%P", #Datenbank-Passwort
-        database="projekt" #Datenbank-Name
+root_password = getpass.getpass("Enter MySQL root password: ")
+
+try:
+    connection = mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password=root_password)
+    
+    cursor = connection.cursor()
+    print("Connection to MySQL database established successfully.")
+
+    cursor.execute("CREATE USER IF NOT EXISTS 'pcshop_user'@'localhost' IDENTIFIED BY 'xQrYP2ttqX*w5%P';")
+    cursor.execute("GRANT ALL PRIVILEGES ON *.* TO 'pcshop_user'@'localhost';")
+    cursor.execute("FLUSH PRIVILEGES;")
+    cursor.execute("CREATE DATABASE IF NOT EXISTS projekt CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
+    print("Database 'projekt' created or already exists.")
+    print("User erstellt und Rechte vergeben")
+    cursor.close()
+    connection.close()
+except mysql.connector.Error as err:
+    print(f"Error: {err}")
+
+def get_connection():
+    return mysql.connector.connect(
+        host='localhost',
+        user='pcshop_user',
+        password='xQrYP2ttqX*w5%P',
+        database='projekt'
     )
 
-def execute(query, params=None, fetch=False): #Führt eine SQL-Abfrage aus:
-    conn = get_connection() #Verbindung zur Datenbank herstellen
-    cursor = conn.cursor(dictionary=True) #Cursor erstellen
+def execute(conn, query):
+    cursor = conn.cursor()
+    cursor.execute(query)
+    conn.commit()
+    cursor.close()
 
-    cursor.execute(query, params) #SQL-Abfrage ausführen
-
-    result = cursor.fetchall() if fetch else None #Ergebnisse abrufen, falls erforderlich
-
-    conn.commit() #Änderungen in der Datenbank speichern
-    cursor.close() #Cursor schließen
-    conn.close() #Verbindung zur Datenbank schließen
-    return result #Ergebnisse zurückgeben
-
-
-# Tabellen erstellen, falls sie nicht existieren
 def create_tables():
-    # CASES
-    execute("""
+    conn = get_connection()
+
+    # Cases
+    execute(conn, """
     CREATE TABLE IF NOT EXISTS cases (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        seriennummer VARCHAR(50) NOT NULL UNIQUE,
-        klarnamen VARCHAR(20) NOT NULL,
-        groesse VARCHAR(20) NOT NULL,
-        farbe VARCHAR(20) NOT NULL,
-        status ENUM('Verfügbar','Ausverkauft') NOT NULL,
-        preis DECIMAL(10,2) NOT NULL
+        seriennummer VARCHAR(50),
+        klarnamen VARCHAR(20),
+        groesse VARCHAR(20),
+        farbe VARCHAR(20),
+        status ENUM('Verfügbar','Ausverkauft'),
+        preis DECIMAL(10,2)
     )
     """)
-
-    # GRAFIKKARTEN
-    execute("""
+    # Grafikkarten
+    execute(conn, """
     CREATE TABLE IF NOT EXISTS grafikkarten (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        seriennummer VARCHAR(50) NOT NULL UNIQUE,
-        klarnamen VARCHAR(20) NOT NULL,
-        groesse VARCHAR(20) NOT NULL,
-        status ENUM('Verfügbar','Ausverkauft') NOT NULL,
-        preis DECIMAL(10,2) NOT NULL
+        seriennummer VARCHAR(50),
+        klarnamen VARCHAR(20),
+        groesse VARCHAR(20),
+        status ENUM('Verfügbar','Ausverkauft'),
+        preis DECIMAL(10,2)
     )
     """)
 
-    # PROZESSOREN
-    execute("""
+    # Prozessoren
+    execute(conn, """
     CREATE TABLE IF NOT EXISTS prozessoren (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        seriennummer VARCHAR(50) NOT NULL UNIQUE,
-        klarnamen VARCHAR(20) NOT NULL,
-        status ENUM('Verfügbar','Ausverkauft') NOT NULL,
-        preis DECIMAL(10,2) NOT NULL
+        seriennummer VARCHAR(50),
+        klarnamen VARCHAR(20),
+        status ENUM('Verfügbar','Ausverkauft'),
+        preis DECIMAL(10,2)
     )
     """)
 
-    # MAINBOARDS
-    execute("""
+    # Mainboards
+    execute(conn, """
     CREATE TABLE IF NOT EXISTS mainboards (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        seriennummer VARCHAR(50) NOT NULL UNIQUE,
-        klarnamen VARCHAR(20) NOT NULL,
-        groesse VARCHAR(20) NOT NULL,
-        status ENUM('Verfügbar','Ausverkauft') NOT NULL,
-        preis DECIMAL(10,2) NOT NULL
+        seriennummer VARCHAR(50),
+        klarnamen VARCHAR(20),
+        groesse VARCHAR(20),
+        status ENUM('Verfügbar','Ausverkauft'),
+        preis DECIMAL(10,2)
     )
     """)
-
-    # ARBEITSSPEICHER
-    execute("""
+    # Arbeitsspeicher
+    execute(conn, """
     CREATE TABLE IF NOT EXISTS arbeitsspeicher (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        seriennummer VARCHAR(50) NOT NULL UNIQUE,
-        klarnamen VARCHAR(20) NOT NULL,
-        speichergroesse VARCHAR(30) NOT NULL,
-        status ENUM('Verfügbar','Ausverkauft') NOT NULL,
-        preis DECIMAL(10,2) NOT NULL
+        seriennummer VARCHAR(50),
+        klarnamen VARCHAR(20),
+        speichergroesse VARCHAR(30),
+        status ENUM('Verfügbar','Ausverkauft'),
+        preis DECIMAL(10,2)
     )
     """)
-
-    # FESTPLATTEN
-    execute("""
+    #Festplatten
+    execute(conn, """
     CREATE TABLE IF NOT EXISTS festplatten (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        seriennummer VARCHAR(50) NOT NULL UNIQUE,
-        klarnamen VARCHAR(20) NOT NULL,
-        speichergroesse VARCHAR(30) NOT NULL,
-        status ENUM('Verfügbar','Ausverkauft') NOT NULL,
-        preis DECIMAL(10,2) NOT NULL
+        seriennummer VARCHAR(50),
+        klarnamen VARCHAR(20),
+        speichergroesse VARCHAR(30),
+        status ENUM('Verfügbar','Ausverkauft'),
+        preis DECIMAL(10,2)
     )
     """)
 
-    # NETZTEILE
-    execute("""
+    #Netzteile
+    execute(conn, """
     CREATE TABLE IF NOT EXISTS netzteile (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        seriennummer VARCHAR(50) NOT NULL UNIQUE,
-        klarnamen VARCHAR(20) NOT NULL,
-        leistung VARCHAR(20) NOT NULL,
-        status ENUM('Verfügbar','Ausverkauft') NOT NULL,
-        preis DECIMAL(10,2) NOT NULL
+        seriennummer VARCHAR(50),
+        klarnamen VARCHAR(20),
+        leistung VARCHAR(20),
+        status ENUM('Verfügbar','Ausverkauft'),
+        preis DECIMAL(10,2)
     )
     """)
 
-    # KÜHLER
-    execute("""
+    #Kühler
+    execute(conn, """
     CREATE TABLE IF NOT EXISTS kuehler (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        seriennummer VARCHAR(50) NOT NULL UNIQUE,
-        klarnamen VARCHAR(20) NOT NULL,
-        typ VARCHAR(20) NOT NULL,
-        status ENUM('Verfügbar','Ausverkauft') NOT NULL,
-        preis DECIMAL(10,2) NOT NULL
+        seriennummer VARCHAR(50),
+        klarnamen VARCHAR(20),
+        typ VARCHAR(20),
+        status ENUM('Verfügbar','Ausverkauft'),
+        preis DECIMAL(10,2)
     )
     """)
 
-    # ZUBEHÖR
-    execute("""
+    #Zubehör
+    execute(conn, """
     CREATE TABLE IF NOT EXISTS zubehoer (
         id INT AUTO_INCREMENT PRIMARY KEY,
         seriennummer VARCHAR(50) NOT NULL UNIQUE,
         klarnamen VARCHAR(20) NOT NULL,
-        typ VARCHAR(20) NOT NULL,
+        typ VARCHAR(30) NOT NULL,
         status ENUM('Verfügbar','Ausverkauft') NOT NULL,
         preis DECIMAL(10,2) NOT NULL
     )
     """)
 
-    print("✅ Alle Tabellen wurden erfolgreich erstellt!")
+    conn.close()
+    print("Tables created successfully.")
 
 if __name__ == "__main__":
     create_tables()
