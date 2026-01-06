@@ -13,16 +13,22 @@ def convert_decimals(rows):
                 row[key] = float(value)
     return rows
 
-def export_to_json(table_name, filename):
+def export_to_json(table_name, folder="export", filename=None):
+    if not filename:
+        filename = f{table_name}.json"
+    
+    os.makedirs(folder, exist_ok=True)
+    filepath = os.path.join(folder, filename)
+    rows = export(table_name)
     rows = execute(f"SELECT * FROM {table_name}", fetch=True)
     
     if not rows:
         print(f"Die Tabelle '{table_name}' ist leer. Keine Daten zum Exportieren.")
         return
     rows = convert_decimals(rows)
-    with open(filename, 'w', encoding='utf-8') as f:
+    with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(rows, f, indent=4, ensure_ascii=False)
-    print(f"{table_name} wurde erfolgreich nach {filename} exportiert.")
+    print(f"{table_name} wurde erfolgreich nach {filepath} exportiert.")
 
 # -------------------------------
 # Funktionen für Tabellen
@@ -38,14 +44,18 @@ def export(table): #Exportiert alle Einträge aus der angegebenen Tabelle:
     return execute(f"SELECT * FROM {table}", fetch=True)
 
 
-def export_to_csv(table, filename=None): #Exportiert die Tabelle in eine CSV-Datei:
+def export_to_csv(table, folder="export", filename=None): #Exportiert die Tabelle in eine CSV-Datei:
     if not filename:
         filename = f"{table}.csv"
+    os.makedirs(folder, exist_ok=True)
+
+    filepath = os.path.join(folder, filename)
+
     data = export(table)
     if not data:
         print(f"Die Tabelle '{table}' ist leer. Keine Daten zum Exportieren.")
         return
-    with open(filename, mode='w', newline='', encoding='utf-8') as f:
+    with open(filepath, mode='w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=data[0].keys())
         writer.writeheader()
         writer.writerows(data)
@@ -208,12 +218,12 @@ def make_pc_config(filename="pc_konfiguration.json", selection=None):
 if __name__ == "__main__":
     fill_all()
     export_all_to_csv()
-    export_to_json("cases", "cases.json")
-    export_to_json("grafikkarten", "grafikkarten.json")
-    export_to_json("prozessoren", "prozessoren.json")
-    export_to_json("mainboards", "mainboards.json")
-    export_to_json("arbeitsspeicher", "arbeitsspeicher.json")
-    export_to_json("festplatten", "festplatten.json")
-    export_to_json("netzteile", "netzteile.json")
-    export_to_json("kuehler", "kuehler.json")
-    export_to_json("zubehoer", "zubehoer.json")
+    export_to_json("cases", filename="cases.json")
+    export_to_json("grafikkarten", filename="grafikkarten.json")
+    export_to_json("prozessoren", filename="prozessoren.json")
+    export_to_json("mainboards", filename="mainboards.json")
+    export_to_json("arbeitsspeicher", filename="arbeitsspeicher.json")
+    export_to_json("festplatten", filename="festplatten.json")
+    export_to_json("netzteile", filename="netzteile.json")
+    export_to_json("kuehler", filename="kuehler.json")
+    export_to_json("zubehoer", filename="zubehoer.json")
