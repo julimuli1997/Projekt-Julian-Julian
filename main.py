@@ -15,7 +15,7 @@ def convert_decimals(rows):
 
 def export_to_json(table_name, folder="export", filename=None):
     if not filename:
-        filename = f{table_name}.json"
+        filename = f"{table_name}.json"
     
     os.makedirs(folder, exist_ok=True)
     filepath = os.path.join(folder, filename)
