@@ -16,24 +16,6 @@ def insert(table, columns, values): #Fügt einen neuen Eintrag in die Tabelle ei
 def export(table): #Exportiert alle Einträge aus der angegebenen Tabelle:
     return execute(f"SELECT * FROM {table}", fetch=True)
 
-
-def export_to_csv(table, folder="export", filename=None): #Exportiert die Tabelle in eine CSV-Datei:
-    if not filename:
-        filename = f"{table}.csv"
-    os.makedirs(folder, exist_ok=True)
-
-    filepath = os.path.join(folder, filename)
-
-    data = export(table)
-    if not data:
-        print(f"Die Tabelle '{table}' ist leer. Keine Daten zum Exportieren.")
-        return
-    with open(filepath, mode='w', newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=data[0].keys())
-        writer.writeheader()
-        writer.writerows(data)
-    print(f"{table} wurde erfolgreich nach {filename} exportiert.")
-
 def update(table, key_column, key_value, updates: dict): #Aktualisiert einen Eintrag in der Tabelle:
     set_clause = ", ".join([f"{k}=%s" for k in updates]) 
     values = tuple(updates.values()) + (key_value,)
