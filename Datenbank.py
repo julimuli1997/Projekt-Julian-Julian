@@ -150,6 +150,51 @@ def create_tables():
         preis DECIMAL(10,2) NOT NULL
     )
     """)
+    #PC Builds
+    execute("""
+    CREATE TABLE IF NOT EXISTS pc_builds(
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            
+            case_id INT NOT NULL,
+            grafikkarte_id INT NOT NULL,
+            prozessor_id INT NOT NULL,
+            mainboard_id INT NOT NULL,
+            arbeitsspeicher_id INT NOT NULL,
+            festplatte_id INT NOT NULL,
+            netzteil_id INT NOT NULL,
+            kuehler_id INT NOT NULL,
+            zubehoer_id INT NOT NULL,
+            
+            CONSTRAINT fk_case FOREIGN KEY (case_id) 
+            REFERENCES cases(id)
+            ON DELETE RESTRICT ON UPDATE CASCADE,
+            CONSTRAINT fk_grafikkarte FOREIGN KEY (grafikkarte_id) 
+            REFERENCES grafikkarten(id)
+            ON DELETE RESTRICT ON UPDATE CASCADE,
+            CONSTRAINT fk_prozessor FOREIGN KEY (prozessor_id) 
+            REFERENCES prozessoren(id)
+            ON DELETE RESTRICT ON UPDATE CASCADE,
+            CONSTRAINT fk_mainboard FOREIGN KEY (mainboard_id) 
+            REFERENCES mainboards(id)
+            ON DELETE RESTRICT ON UPDATE CASCADE,
+            CONSTRAINT fk_arbeitsspeicher FOREIGN KEY (arbeitsspeicher_id) 
+            REFERENCES arbeitsspeicher(id)
+            ON DELETE RESTRICT ON UPDATE CASCADE,
+            CONSTRAINT fk_festplatte FOREIGN KEY (festplatte_id) 
+            REFERENCES festplatten(id)
+            ON DELETE RESTRICT ON UPDATE CASCADE,
+            CONSTRAINT fk_netzteil FOREIGN KEY (netzteil_id) 
+            REFERENCES netzteile(id)
+            ON DELETE RESTRICT ON UPDATE CASCADE,
+            CONSTRAINT fk_kuehler FOREIGN KEY (kuehler_id) 
+            REFERENCES kuehler(id)
+            ON DELETE RESTRICT ON UPDATE CASCADE,
+            CONSTRAINT fk_zubehoer FOREIGN KEY (zubehoer_id) 
+            REFERENCES zubehoer(id)
+            ON DELETE RESTRICT ON UPDATE CASCADE
+    )
+    """)
+
 
     conn.close()
     print("Tables created successfully.")
