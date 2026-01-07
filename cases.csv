@@ -1,0 +1,5 @@
+id,seriennummer,klarnamen,groesse,farbe,status,preis
+1,CASE001,NZXT H510,ATX,Schwarz,Verfügbar,89.99
+2,CASE002,Corsair 4000D,ATX,Weiß,Verfügbar,79.99
+3,CASE003,Meshify C,ATX,Schwarz,Verfügbar,99.99
+4,CASE004,MasterBox,ATX,Blau,Verfügbar,69.99

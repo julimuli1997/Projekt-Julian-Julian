@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "seriennummer": "CPU001",
+        "klarnamen": "Intel i7-12700K",
+        "status": "Verfügbar",
+        "preis": 399.99
+    },
+    {
+        "id": 2,
+        "seriennummer": "CPU002",
+        "klarnamen": "Intel i9-12900K",
+        "status": "Verfügbar",
+        "preis": 599.99
+    },
+    {
+        "id": 3,
+        "seriennummer": "CPU003",
+        "klarnamen": "Ryzen 7 5800X",
+        "status": "Verfügbar",
+        "preis": 349.99
+    },
+    {
+        "id": 4,
+        "seriennummer": "CPU004",
+        "klarnamen": "Ryzen 9 5900X",
+        "status": "Verfügbar",
+        "preis": 499.99
+    }
+]

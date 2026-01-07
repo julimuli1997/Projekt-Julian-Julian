@@ -1,0 +1,5 @@
+id,seriennummer,klarnamen,speichergroesse,status,preis
+1,HDD001,Samsung 970 EVO,1TB,Verfügbar,109.99
+2,HDD002,WD Blue SN550,1TB,Verfügbar,89.99
+3,HDD003,Crucial MX500,500GB,Verfügbar,59.99
+4,HDD004,Seagate Barracuda,2TB,Verfügbar,79.99

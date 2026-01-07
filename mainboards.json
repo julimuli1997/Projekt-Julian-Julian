@@ -1,0 +1,34 @@
+[
+    {
+        "id": 1,
+        "seriennummer": "MB001",
+        "klarnamen": "ASUS B660",
+        "groesse": "ATX",
+        "status": "Verfügbar",
+        "preis": 219.99
+    },
+    {
+        "id": 2,
+        "seriennummer": "MB002",
+        "klarnamen": "MSI B550",
+        "groesse": "ATX",
+        "status": "Verfügbar",
+        "preis": 189.99
+    },
+    {
+        "id": 3,
+        "seriennummer": "MB003",
+        "klarnamen": "Gigabyte Z690",
+        "groesse": "ATX",
+        "status": "Verfügbar",
+        "preis": 299.99
+    },
+    {
+        "id": 4,
+        "seriennummer": "MB004",
+        "klarnamen": "ASRock B660",
+        "groesse": "ATX",
+        "status": "Verfügbar",
+        "preis": 179.99
+    }
+]

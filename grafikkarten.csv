@@ -1,0 +1,5 @@
+id,seriennummer,klarnamen,groesse,status,preis
+1,GPU001,RTX 4070,Groß,Verfügbar,649.99
+2,GPU002,RTX 4080,Groß,Verfügbar,1199.99
+3,GPU003,RX 7900 XT,Groß,Verfügbar,899.99
+4,GPU004,GTX 1660,Mittel,Verfügbar,249.99

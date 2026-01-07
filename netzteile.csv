@@ -1,0 +1,5 @@
+id,seriennummer,klarnamen,leistung,status,preis
+1,PSU001,Corsair RM750,750W,Verfügbar,129.99
+2,PSU002,Seasonic GX650,650W,Verfügbar,119.99
+3,PSU003,BeQuiet 750W,750W,Verfügbar,139.99
+4,PSU004,Cooler Master 650W,650W,Verfügbar,99.99

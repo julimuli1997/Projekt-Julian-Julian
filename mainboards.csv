@@ -1,0 +1,5 @@
+id,seriennummer,klarnamen,groesse,status,preis
+1,MB001,ASUS B660,ATX,Verfügbar,219.99
+2,MB002,MSI B550,ATX,Verfügbar,189.99
+3,MB003,Gigabyte Z690,ATX,Verfügbar,299.99
+4,MB004,ASRock B660,ATX,Verfügbar,179.99
