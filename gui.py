@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
         self.search_bar = QLineEdit()
         self.search_bar.setPlaceholderText("Suche...")
         layout.addWidget(self.search_bar)
-    
+
     def Pc_config_button(self, layout):
         self.pc_config_button = QPushButton("PC-Konfiguration erstellen")
         layout.addWidget(self.pc_config_button)
@@ -48,6 +48,19 @@ class MainWindow(QMainWindow):
     def open_pc_config_window(self):
         self.pc_config_window = PcConfigWindow()
         self.pc_config_window.show()
+
+    def all_products_screen_button(self, layout):
+        self.all_products_screen_button = QPushButton("Alle Produkte anzeigen")
+        layout.addWidget(self.all_products_screen_button)
+        self.all_products_screen_button.setStyleSheet("background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px;")
+        self.all_products_screen_button.clicked.connect(self.open_all_products_screen)
+
+    def open_all_products_screen(self):
+        self.all_products_screen = product_screen()
+        self.all_products_screen.show()
+
+
+
 
     
 
@@ -138,6 +151,18 @@ class PcConfigWindow(QMainWindow):
         self.price_label = QLabel("Gesamtpreis: 0,00 €")
         self.price_label.setStyleSheet("background-color: #3498db; color: white; font-weight: bold; font-size: 16px; padding: 10px; border-radius: 5px; margin-top: 10px;")
         layout.addWidget(self.price_label)
+
+
+
+class product_screen(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("Alle Produkte anzeigen")
+        self.setGeometry(100, 100, 400, 300)
+        self.setStyleSheet("background-color: #e0e0e0;")
+        
+
 
 app = QApplication(sys.argv)
 window = MainWindow()
