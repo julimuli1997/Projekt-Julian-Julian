@@ -4,35 +4,8 @@ import os
 import csv
 import json
 from decimal import Decimal
+from exporter import export_all_to_csv, export_all_to_json
 
-
-def convert_decimals(rows):
-    for row in rows:
-        for key, value in row.items():
-            if isinstance(value, Decimal):
-                row[key] = float(value)
-    return rows
-
-def export_to_json(table_name, folder="export", filename=None):
-    if not filename:
-        filename = f"{table_name}.json"
-    
-    os.makedirs(folder, exist_ok=True)
-    filepath = os.path.join(folder, filename)
-    rows = export(table_name)
-    rows = execute(f"SELECT * FROM {table_name}", fetch=True)
-    
-    if not rows:
-        print(f"Die Tabelle '{table_name}' ist leer. Keine Daten zum Exportieren.")
-        return
-    rows = convert_decimals(rows)
-    with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(rows, f, indent=4, ensure_ascii=False)
-    print(f"{table_name} wurde erfolgreich nach {filepath} exportiert.")
-
-# -------------------------------
-# Funktionen für Tabellen
-# -------------------------------
 
 def insert(table, columns, values): #Fügt einen neuen Eintrag in die Tabelle ein oder aktualisiert ihn bei Duplikat:
     placeholders = ','.join(['%s'] * len(values)) 
@@ -159,14 +132,6 @@ def fill_all():
 # Erfolgsmeldung
     print("✅ Alle Tabellen wurden sauber mit 4 Einträgen gefüllt, keine Duplikate!")
 
-def export_all_to_csv():
-    tables = [
-        "cases", "grafikkarten", "prozessoren", "mainboards",
-        "arbeitsspeicher", "festplatten", "netzteile", "kuehler", "zubehoer"
-    ]
-    for table in tables:
-        export_to_csv(table)
-
 #Funktionen zum Anzeigen der Daten
 
 def show_all():
@@ -218,12 +183,5 @@ def make_pc_config(filename="pc_konfiguration.json", selection=None):
 if __name__ == "__main__":
     fill_all()
     export_all_to_csv()
-    export_to_json("cases", filename="cases.json")
-    export_to_json("grafikkarten", filename="grafikkarten.json")
-    export_to_json("prozessoren", filename="prozessoren.json")
-    export_to_json("mainboards", filename="mainboards.json")
-    export_to_json("arbeitsspeicher", filename="arbeitsspeicher.json")
-    export_to_json("festplatten", filename="festplatten.json")
-    export_to_json("netzteile", filename="netzteile.json")
-    export_to_json("kuehler", filename="kuehler.json")
-    export_to_json("zubehoer", filename="zubehoer.json")
+    export_all_to_json()
+   
