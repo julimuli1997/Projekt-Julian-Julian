@@ -4,11 +4,11 @@ from pathlib import Path
 from PySide6.QtWidgets import (QApplication, QMainWindow, QPushButton, QVBoxLayout, 
                                QHBoxLayout, QWidget, QLineEdit, QFormLayout, 
                                QComboBox, QLabel, QGroupBox, QTabWidget, QFrame,
-                               QTableWidget, QTableWidgetItem, QHeaderView)
+                               QTableWidget, QTableWidgetItem, QHeaderView,
+                               QDialog, QDialogButtonBox, QMessageBox)
 from PySide6.QtGui import QColor
-from main import *
-from exporter import *
-from Datenbank import *
+from decimal import Decimal
+from main import fetch_table, add_product, columns_map, fill_all
 
 
 
@@ -235,8 +235,11 @@ class ProductListPanel(QFrame):
 
         layout.addLayout(button_layout)
 
-    def populate_tabs(self):
-        """Füllt die Tabs mit Daten aus der Datenbank."""
+        # Signal verbinden
+        self.add_product_btn.clicked.connect(self.open_add_product_dialog)
+
+    def populate_tabs(self, search_term=None):
+        """Füllt die Tabs mit Daten aus der Datenbank, optional gefiltert."""
         # Zuordnung von Tab-Namen zu Datenbank-Tabellen
         tab_map = {
             "Cases": "cases",
@@ -260,7 +263,7 @@ class ProductListPanel(QFrame):
             # Das Widget des aktuellen Tabs holen
             tab_widget = self.tabs.widget(i)
             
-            # Layout erstellen oder bestehendes bereinigen (falls Refresh geklickt wird)
+            # Layout erstellen oder bestehendes bereinigen
             if not tab_widget.layout():
                 layout = QVBoxLayout(tab_widget)
             else:
@@ -270,9 +273,9 @@ class ProductListPanel(QFrame):
                     if child.widget():
                         child.widget().deleteLater()
             
-            # Daten aus der DB holen
+            # Daten aus der DB holen, optional gefiltert
             try:
-                data = fetch_table(table_name)
+                data = fetch_table(table_name, search_term=search_term)
             except Exception as e:
                 print(f"Fehler beim Laden von {table_name}: {e}")
                 data = []
@@ -283,7 +286,8 @@ class ProductListPanel(QFrame):
 
             # Tabelle erstellen und konfigurieren
             table_widget = QTableWidget()
-            headers = list(data[0].keys())
+            # Die Header aus der `columns_map` holen, um die korrekte Reihenfolge sicherzustellen
+            headers = columns_map.get(table_name, list(data[0].keys()))
             table_widget.setColumnCount(len(headers))
             table_widget.setHorizontalHeaderLabels(headers)
             table_widget.setRowCount(len(data))
@@ -305,6 +309,106 @@ class ProductListPanel(QFrame):
                     table_widget.setItem(row_idx, col_idx, item)
             
             layout.addWidget(table_widget)
+    
+    def open_add_product_dialog(self):
+        """Öffnet den Dialog zum Hinzufügen eines neuen Produkts."""
+        # Zuordnung von Tab-Namen zu Datenbank-Tabellen
+        tab_map = {
+            "Cases": "cases", "Grafikkarten": "grafikkarten", "Prozessoren": "prozessoren",
+            "Mainboards": "mainboards", "Arbeitsspeicher": "arbeitsspeicher",
+            "Festplatten": "festplatten", "Netzteile": "netzteile",
+            "Kühler": "kuehler", "Zubehör": "zubehoer"
+        }
+
+        current_tab_text = self.tabs.tabText(self.tabs.currentIndex())
+        table_name = tab_map.get(current_tab_text)
+
+        if not table_name:
+            QMessageBox.warning(self, "Fehler", "Keine gültige Kategorie ausgewählt.")
+            return
+
+        dialog = AddProductDialog(table_name, parent=self)
+        if dialog.exec() == QDialog.Accepted:
+            try:
+                data = dialog.get_data()
+                add_product(table_name, data)
+                QMessageBox.information(self, "Erfolg", f"Produkt wurde erfolgreich zu '{current_tab_text}' hinzugefügt.")
+                self.populate_tabs() # Tabs neu laden
+            except Exception as e:
+                QMessageBox.critical(self, "Datenbankfehler", f"Fehler beim Hinzufügen des Produkts:\n{e}")
+
+# ---------------------------------------------------------
+# 4. DIALOG ZUM HINZUFÜGEN VON PRODUKTEN
+# ---------------------------------------------------------
+class AddProductDialog(QDialog):
+    def __init__(self, table_name, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(f"Neues Produkt für '{table_name}' hinzufügen")
+        self.setStyleSheet("""
+            QDialog {
+                background-color: white; 
+                border-radius: 10px;
+                padding: 20px;
+            }
+            QLabel {
+                color: black;
+                font-weight: bold;
+            }
+            QLineEdit, QComboBox {
+                background-color: white;
+                color: black;
+                border: 1px solid #cccccc;
+                padding: 5px;
+                border-radius: 3px;
+            }
+        """)
+
+        self.table_name = table_name
+        self.input_widgets = {}
+
+        layout = QVBoxLayout(self)
+        form_layout = QFormLayout()
+
+        # Dynamisch Eingabefelder erstellen
+        columns = columns_map.get(self.table_name, [])
+        for col in columns:
+            if col == "id": continue # ID wird automatisch vergeben
+
+            label = QLabel(col.replace("_", " ").title() + ":")
+            if col == "status":
+                widget = QComboBox()
+                widget.addItems(["Verfügbar", "Ausverkauft"])
+            else:
+                widget = QLineEdit()
+            
+            form_layout.addRow(label, widget)
+            self.input_widgets[col] = widget
+
+        layout.addLayout(form_layout)
+
+        # OK/Cancel Buttons
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        button_box.accepted.connect(self.accept)
+        button_box.rejected.connect(self.reject)
+        
+        # Styling für die Buttons
+        ok_button = button_box.button(QDialogButtonBox.Ok)
+        ok_button.setStyleSheet("background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px;")
+        
+        cancel_button = button_box.button(QDialogButtonBox.Cancel)
+        cancel_button.setStyleSheet("background-color: #f44336; color: white; padding: 10px; border-radius: 5px;")
+
+        layout.addWidget(button_box)
+
+    def get_data(self):
+        """Sammelt die Daten aus den Eingabefeldern."""
+        data = {}
+        for col, widget in self.input_widgets.items():
+            if isinstance(widget, QComboBox):
+                data[col] = widget.currentText()
+            else:
+                data[col] = widget.text()
+        return data
 
 
 # ---------------------------------------------------------
@@ -317,22 +421,17 @@ class UnifiedWindow(QMainWindow):
         self.setWindowTitle("PC-Shop Dashboard")
         self.setGeometry(100, 100, 1200, 700)
         
-        # WICHTIG: Keine dunkle Hintergrundfarbe mehr setzen!
-        # Standard-Grau belassen, damit keine schwarzen Balken entstehen.
-
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
 
-        # Hauptlayout
         main_h_layout = QHBoxLayout(central_widget)
-        # Alles auf 0, damit die Teile sich berühren
         main_h_layout.setSpacing(0)
         main_h_layout.setContentsMargins(0, 0, 0, 0)
 
         # --- LINKS ---
         left_container = QWidget()
         left_layout = QVBoxLayout(left_container)
-        left_layout.setSpacing(0) # Kein Abstand zwischen oben und unten
+        left_layout.setSpacing(0)
         left_layout.setContentsMargins(0, 0, 0, 0)
 
         self.menu_panel = MenuPanel()
@@ -351,9 +450,22 @@ class UnifiedWindow(QMainWindow):
         self.product_panel.populate_tabs()
         self.config_panel.fill_in_dropdowns_from_db()
         
-        # Refresh-Button verbinden
-        self.menu_panel.all_products_button.clicked.connect(self.product_panel.populate_tabs)
-        self.menu_panel.all_products_button.clicked.connect(self.config_panel.fill_in_dropdowns_from_db)
+        # --- Signale verbinden ---
+        # Suchleiste
+        self.menu_panel.search_bar.textChanged.connect(self.handle_search)
+        
+        # "Produkte aktualisieren"-Button leert die Suche und füllt alles neu
+        self.menu_panel.all_products_button.clicked.connect(
+            lambda: self.menu_panel.search_bar.clear()
+        )
+        self.menu_panel.all_products_button.clicked.connect(
+            self.config_panel.fill_in_dropdowns_from_db
+        )
+
+    def handle_search(self, text):
+        """Wird aufgerufen, wenn sich der Text in der Suchleiste ändert."""
+        self.product_panel.populate_tabs(search_term=text)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

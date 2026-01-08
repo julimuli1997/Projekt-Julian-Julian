@@ -13,8 +13,16 @@ def insert(table, columns, values): #Fügt einen neuen Eintrag in die Tabelle ei
     updates = ','.join([f"{col}=VALUES({col})" for col in columns if col != "id"])
     execute(f"INSERT INTO {table} ({cols}) VALUES ({placeholders}) ON DUPLICATE KEY UPDATE {updates}", values)
 
-def export(table): #Exportiert alle Einträge aus der angegebenen Tabelle:
-    return execute(f"SELECT * FROM {table}", fetch=True)
+def export(table, search_term=None): #Exportiert alle Einträge aus der angegebenen Tabelle:
+    if search_term:
+        # Fügt %-Wildcards für eine LIKE-Suche hinzu
+        query = f"SELECT * FROM {table} WHERE klarnamen LIKE %s"
+        params = (f"%{search_term}%",)
+        return execute(query, params, fetch=True)
+    else:
+        return execute(f"SELECT * FROM {table}", fetch=True)
+
+fetch_table = export # Alias für die GUI
 
 def update(table, key_column, key_value, updates: dict): #Aktualisiert einen Eintrag in der Tabelle:
     set_clause = ", ".join([f"{k}=%s" for k in updates]) 
@@ -23,6 +31,29 @@ def update(table, key_column, key_value, updates: dict): #Aktualisiert einen Ein
 
 def delete(table, key_column, key_value): #Löscht einen Eintrag aus der Tabelle:
     execute(f"DELETE FROM {table} WHERE {key_column}=%s", (key_value,))
+
+
+columns_map = {
+    "cases": ["seriennummer","klarnamen","groesse","farbe","status","preis"],
+    "grafikkarten": ["seriennummer","klarnamen","groesse","status","preis"],
+    "prozessoren": ["seriennummer","klarnamen","status","preis"],
+    "mainboards": ["seriennummer","klarnamen","groesse","status","preis"],
+    "arbeitsspeicher": ["seriennummer","klarnamen","speichergroesse","status","preis"],
+    "festplatten": ["seriennummer","klarnamen","speichergroesse","status","preis"],
+    "netzteile": ["seriennummer","klarnamen","leistung","status","preis"],
+    "kuehler": ["seriennummer","klarnamen","typ","status","preis"],
+    "zubehoer": ["seriennummer","klarnamen","typ","status","preis"]
+}
+
+def add_product(table_name, data):
+    """Fügt ein neues Produkt in die angegebene Tabelle ein."""
+    if table_name not in columns_map:
+        raise ValueError(f"Unbekannte Tabelle: {table_name}")
+
+    columns = columns_map[table_name]
+    values = [data.get(col) for col in columns]
+    insert(table_name, columns, values)
+    print(f"Produkt in '{table_name}' hinzugefügt: {data}")
 
 
 # -------------------------------
@@ -88,17 +119,7 @@ def fill_all():
     }
 
     # Spalten für jede Tabelle
-    columns_map = {
-        "cases": ["seriennummer","klarnamen","groesse","farbe","status","preis"],
-        "grafikkarten": ["seriennummer","klarnamen","groesse","status","preis"],
-        "prozessoren": ["seriennummer","klarnamen","status","preis"],
-        "mainboards": ["seriennummer","klarnamen","groesse","status","preis"],
-        "arbeitsspeicher": ["seriennummer","klarnamen","speichergroesse","status","preis"],
-        "festplatten": ["seriennummer","klarnamen","speichergroesse","status","preis"],
-        "netzteile": ["seriennummer","klarnamen","leistung","status","preis"],
-        "kuehler": ["seriennummer","klarnamen","typ","status","preis"],
-        "zubehoer": ["seriennummer","klarnamen","typ","status","preis"]
-    }
+    
 
     # Alle Tabellen optional leeren vor Einfügen
     for table in tables_data.keys():
