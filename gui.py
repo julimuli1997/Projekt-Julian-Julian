@@ -1,7 +1,7 @@
 import sys
 import os
 import PySide6
-from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QLineEdit, QFormLayout, QComboBox, QLabel, QGroupBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QLineEdit, QFormLayout, QComboBox, QLabel, QGroupBox, QTabWidget
 from pathlib import Path
 
 
@@ -30,6 +30,7 @@ class MainWindow(QMainWindow):
 
         self.search_database(layout)
         self.Pc_config_button(layout)
+        self.all_products_screen_button(layout)
         layout.addStretch()
 
     # Mainwindow ist das Hauptmenü -> von hieraus gelangt man in alle anderen Fenster
@@ -159,9 +160,50 @@ class product_screen(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Alle Produkte anzeigen")
-        self.setGeometry(100, 100, 400, 300)
+        self.setGeometry(100, 100, 800, 600)
         self.setStyleSheet("background-color: #e0e0e0;")
+
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        layout = QVBoxLayout(central_widget)
+
+        self.tabs_for_products(layout)
+
+        button_layout = QHBoxLayout()
+        self.export_database_csv_button(button_layout)
+        self.add_product_button(button_layout)
+        layout.addLayout(button_layout)
         
+
+    def tabs_for_products(self, layout):
+        self.tabs = QTabWidget()
+        
+        categories = ["Cases", "Grafikkarten", "Prozessoren", "Mainboards", 
+                      "Arbeitsspeicher", "Festplatten", "Netzteile", "Kühler", "Zubehör"]
+
+        for category in categories:
+            tab = QWidget()
+            self.tabs.addTab(tab, category)
+
+        layout.addWidget(self.tabs)
+        self.tabs.setStyleSheet("color: black;")
+
+    def export_database_csv_button(self, layout):
+        self.export_btn = QPushButton("CSV-Export erstellen")
+        layout.addWidget(self.export_btn)
+        self.export_btn.setStyleSheet("background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px;")
+        
+    
+    def add_product_button(self, layout):
+        self.add_product_btn = QPushButton("Produkt hinzufügen")
+        layout.addWidget(self.add_product_btn)
+        self.add_product_btn.setStyleSheet("background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px;")
+        
+
+
+
+
+
 
 
 app = QApplication(sys.argv)
