@@ -2,27 +2,34 @@ import mysql.connector
 from mysql.connector import Error
 import getpass
 
-root_password = getpass.getpass("Enter MySQL root password: ")
+def initial_setup():
+    """Führt das erstmalige Setup der Datenbank durch."""
+    try:
+        root_password = getpass.getpass("Enter MySQL root password: ")
+        
+        connection = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password=root_password)
+        
+        cursor = connection.cursor()
+        print("Connection to MySQL database established successfully.")
 
-try:
-    connection = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password=root_password)
-    
-    cursor = connection.cursor()
-    print("Connection to MySQL database established successfully.")
+        cursor.execute("CREATE USER IF NOT EXISTS 'pcshop_user'@'localhost' IDENTIFIED BY 'xQrYP2ttqX*w5%P';")
+        cursor.execute("GRANT ALL PRIVILEGES ON *.* TO 'pcshop_user'@'localhost';")
+        cursor.execute("FLUSH PRIVILEGES;")
+        cursor.execute("CREATE DATABASE IF NOT EXISTS projekt CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
+        print("Database 'projekt' created or already exists.")
+        print("User erstellt und Rechte vergeben")
+        
+        cursor.close()
+        connection.close()
+        
+        # Nach dem Setup direkt die Tabellen erstellen
+        create_tables()
 
-    cursor.execute("CREATE USER IF NOT EXISTS 'pcshop_user'@'localhost' IDENTIFIED BY 'xQrYP2ttqX*w5%P';")
-    cursor.execute("GRANT ALL PRIVILEGES ON *.* TO 'pcshop_user'@'localhost';")
-    cursor.execute("FLUSH PRIVILEGES;")
-    cursor.execute("CREATE DATABASE IF NOT EXISTS projekt CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
-    print("Database 'projekt' created or already exists.")
-    print("User erstellt und Rechte vergeben")
-    cursor.close()
-    connection.close()
-except mysql.connector.Error as err:
-    print(f"Error: {err}")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
 
 def get_connection():
     return mysql.connector.connect(
@@ -200,4 +207,4 @@ def create_tables():
     print("Tables created successfully.")
 
 if __name__ == "__main__":
-    create_tables()
+    initial_setup()
