@@ -92,6 +92,44 @@ def export_to_csv(table_name, folder="export"):
     print(f"✅ {table_name} → {filepath}")
 
 
+def export_pc_config_to_csv(components, folder="export", filename="pc_konfiguration.csv"):
+    """Exportiert die ausgewählte PC-Konfiguration in eine CSV-Datei."""
+    if not components:
+        print("⚠️ Keine Komponenten für den Export ausgewählt.")
+        return False, "Keine Komponenten ausgewählt."
+
+    os.makedirs(folder, exist_ok=True)
+    filepath = os.path.join(folder, filename)
+
+    # Alle möglichen Spalten sammeln, um einen vollständigen Header zu haben
+    headers = set()
+    for component in components:
+        headers.update(component.keys())
+    
+    # Eine konsistente Reihenfolge für die Header sicherstellen
+    ordered_headers = sorted(list(headers))
+
+    try:
+        with open(filepath, mode="w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=ordered_headers)
+            writer.writeheader()
+            # Decimal-Werte für CSV umwandeln (optional, aber gute Praxis)
+            converted_components = []
+            for comp in components:
+                new_comp = comp.copy()
+                for key, value in new_comp.items():
+                    if isinstance(value, Decimal):
+                        new_comp[key] = float(value)
+                converted_components.append(new_comp)
+            writer.writerows(converted_components)
+        
+        print(f"✅ PC-Konfiguration → {filepath}")
+        return True, filepath
+    except Exception as e:
+        print(f"❌ Fehler beim CSV-Export der PC-Konfiguration: {e}")
+        return False, str(e)
+
+
 def export_all_to_csv(folder="export"):
     tables = [
         "cases", "grafikkarten", "prozessoren", "mainboards",

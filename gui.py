@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QPushButton, QVBoxLayo
                                QDialog, QDialogButtonBox, QMessageBox)
 from PySide6.QtGui import QColor
 from decimal import Decimal
-from main import fetch_table, add_product, columns_map, fill_all
+from main import fetch_table, add_product, columns_map, fill_all, export_pc_config_to_csv
 
 
 
@@ -136,6 +136,7 @@ class ConfigPanel(QFrame):
         # Signale verbinden
         for combo in self.combos:
             combo.currentIndexChanged.connect(self.calculate_total_price)
+        self.export_btn.clicked.connect(self.handle_export_click)
     
     def fill_in_dropdowns_from_db(self):
         """Füllt die Dropdown-Menüs mit Daten aus der Datenbank und cacht diese."""
@@ -194,6 +195,44 @@ class ConfigPanel(QFrame):
                         break
         
         self.price_label.setText(f"Gesamtpreis: {total:.2f} €")
+
+    def handle_export_click(self):
+        """Sammelt die ausgewählten Komponenten und exportiert sie als CSV."""
+        selected_components = []
+        
+        combo_map = {
+            self.case_combo: "cases",
+            self.gpu_combo: "grafikkarten",
+            self.cpu_combo: "prozessoren",
+            self.mainboard_combo: "mainboards",
+            self.ram_combo: "arbeitsspeicher",
+            self.disk_combo: "festplatten",
+            self.psu_combo: "netzteile",
+            self.cooler_combo: "kuehler",
+            self.accessory_combo: "zubehoer"
+        }
+
+        for combo, table_name in combo_map.items():
+            selected_name = combo.currentText()
+            if selected_name and table_name in self.component_data:
+                # Finde das passende Item im Cache
+                for item in self.component_data[table_name]:
+                    if item.get("klarnamen") == selected_name:
+                        selected_components.append(item)
+                        break
+        
+        if not selected_components:
+            QMessageBox.warning(self, "Export fehlgeschlagen", "Es wurden keine Komponenten für die Konfiguration ausgewählt.")
+            return
+
+        # Exportfunktion aufrufen
+        success, message = export_pc_config_to_csv(selected_components)
+
+        if success:
+            QMessageBox.information(self, "Export erfolgreich", f"Die PC-Konfiguration wurde erfolgreich exportiert nach:\n{message}")
+        else:
+            QMessageBox.critical(self, "Export fehlgeschlagen", f"Ein Fehler ist aufgetreten:\n{message}")
+
 
 
 # ---------------------------------------------------------
