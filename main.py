@@ -4,7 +4,7 @@ import os
 import csv
 import json
 from decimal import Decimal
-from exporter import export_all_to_csv, export_all_to_json, export_pc_config_to_csv
+from exporter import export_all_to_csv, export_all_to_json, export_pc_config_to_csv, import_from_csv, import_from_json
 
 
 def insert(table, columns, values): #Fügt einen neuen Eintrag in die Tabelle ein oder aktualisiert ihn bei Duplikat:
@@ -187,4 +187,5 @@ if __name__ == "__main__":
     fill_all()
     export_all_to_csv()
     export_all_to_json()
-   
+    import_from_csv("kuehler", "export/kuehler1.csv")
+    import_from_json("cases", "export/cases1.json")
