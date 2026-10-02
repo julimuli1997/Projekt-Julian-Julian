@@ -1,0 +1,10 @@
+farbe,groesse,id,klarnamen,leistung,preis,seriennummer,speichergroesse,status,typ
+Weiß,ATX,2,Corsair 4000D,,79.99,CASE002,,Verfügbar,
+,Groß,3,RX 7900 XT,,899.99,GPU003,,Verfügbar,
+,,3,Ryzen 7 5800X,,349.99,CPU003,,Verfügbar,
+,ATX,3,Gigabyte Z690,,299.99,MB003,,Verfügbar,
+,,2,G.Skill Trident Z,,159.99,RAM002,32GB,Verfügbar,
+,,3,Crucial MX500,,59.99,HDD003,500GB,Verfügbar,
+,,2,Seasonic GX650,650W,119.99,PSU002,,Verfügbar,
+,,1,Noctua NH-D15,,89.99,COOL001,,Verfügbar,Luft
+,,4,Monitorarm,,39.99,ZUB004,,Verfügbar,Zubehör

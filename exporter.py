@@ -19,6 +19,10 @@ def convert_decimals(rows):
                 row[key] = float(value)
     return rows
 
+# -------------------------------
+# Datenbank-Abfrage
+# -------------------------------
+
 
 def fetch_table(table_name):
 
@@ -43,7 +47,8 @@ def export_to_json(table_name, folder="export"):
     rows = fetch_table(table_name)
 
     if not rows:
-        print(f"⚠️ Tabelle '{table_name}' ist leer – kein JSON-Export.")
+        if table_name == "pc_builds":
+            print(f"⚠️ Tabelle '{table_name}' ist leer – kein JSON-Export.")
         return
 
     rows = convert_decimals(rows)
@@ -81,7 +86,8 @@ def export_to_csv(table_name, folder="export"):
     rows = fetch_table(table_name)
 
     if not rows:
-        print(f"⚠️ Tabelle '{table_name}' ist leer – kein CSV-Export.")
+        if table_name == "pc_builds":
+            print(f"⚠️ Tabelle '{table_name}' ist leer – kein CSV-Export.")
         return
 
     with open(filepath, mode="w", newline="", encoding="utf-8") as f:
@@ -139,6 +145,60 @@ def export_all_to_csv(folder="export"):
 
     for table in tables:
        export_to_csv(table, folder)
+
+
+# -------------------------------
+# CSV Import
+# -------------------------------
+
+def import_from_csv(table, filepath):
+    if not os.path.exists(filepath):
+        print(f"❌ Datei '{filepath}' nicht gefunden.")
+        return
+    
+    with open(filepath, newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        rows = list(reader)
+
+    if not rows:
+        print(f"⚠️ Datei '{filepath}' ist leer.")
+        return
+    
+    columns = rows[0].keys()
+    placeholders = ', '.join(['%s'] * len(columns))
+    cols = ', '.join(columns)
+
+    for row in rows:
+        values = tuple(row[col] for col in columns)
+        execute(f"INSERT INTO {table} ({cols}) VALUES ({placeholders})", values)
+
+    print(f"✅ Daten aus '{filepath}' in Tabelle '{table}' importiert.")
+
+# -------------------------------
+# JSON Import
+# -------------------------------
+
+def import_from_json(table, filepath):
+    if not os.path.exists(filepath):
+        print(f"❌ Datei '{filepath}' nicht gefunden.")
+        return
+
+    with open(filepath, newline='', encoding='utf-8') as f:
+        data = json.load(f)
+
+    if not data:
+        print(f"⚠️ Datei '{filepath}' ist leer.")
+        return
+
+    columns = data[0].keys()
+    placeholders = ', '.join(['%s'] * len(columns))
+    cols = ', '.join(columns)
+
+    for row in data:
+        values = tuple(row[col] for col in columns)
+        execute(f"INSERT INTO {table} ({cols}) VALUES ({placeholders})", values)
+    
+    print(f"✅ Daten aus '{filepath}' in Tabelle '{table}' importiert.")
 
 
 # -------------------------------

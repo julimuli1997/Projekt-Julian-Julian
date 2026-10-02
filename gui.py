@@ -5,10 +5,13 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QPushButton, QVBoxLayo
                                QHBoxLayout, QWidget, QLineEdit, QFormLayout, 
                                QComboBox, QLabel, QGroupBox, QTabWidget, QFrame,
                                QTableWidget, QTableWidgetItem, QHeaderView,
-                               QDialog, QDialogButtonBox, QMessageBox)
+                               QDialog, QDialogButtonBox, QMessageBox, QFileDialog, QAbstractItemView)
+from PySide6.QtCore import Signal
 from PySide6.QtGui import QColor
 from decimal import Decimal
-from main import fetch_table, add_product, columns_map, fill_all, export_pc_config_to_csv
+from main import fetch_table, add_product, columns_map, fill_all, export_pc_config_to_csv, delete
+from exporter import import_from_csv, import_from_json
+
 
 
 
@@ -22,6 +25,7 @@ os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = str(plugin_path)
 # 1. LINKER OBERER BEREICH: Menü
 # ---------------------------------------------------------
 class MenuPanel(QFrame):
+    data_imported = Signal()
     def __init__(self):
         super().__init__()
         # Styling: Hellgrau, keine abgerundeten Ecken mehr für nahtlosen Look
@@ -40,6 +44,10 @@ class MenuPanel(QFrame):
         layout.addWidget(self.search_bar)
 
         # Buttons
+        self.import_button = QPushButton("Daten importieren")
+        self.import_button.setStyleSheet("background-color: #3498db; color: white; padding: 10px; border-radius: 5px;")
+        layout.addWidget(self.import_button)
+
         self.pc_config_button = QPushButton("PC-Konfiguration zurücksetzen")
         self.pc_config_button.setStyleSheet("background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px;")
         layout.addWidget(self.pc_config_button)
@@ -49,6 +57,40 @@ class MenuPanel(QFrame):
         layout.addWidget(self.all_products_button)
 
         layout.addStretch()
+
+        self.import_button.clicked.connect(self.handle_import_click)
+
+    def handle_import_click(self):
+        """Öffnet einen Dateidialog zum Importieren von CSV- oder JSON-Dateien."""
+        filepath, _ = QFileDialog.getOpenFileName(
+            self,
+            "Daten importieren",
+            "", # Startverzeichnis
+            "Daten-Dateien (*.csv *.json)"
+        )
+
+        if not filepath:
+            return
+
+        try:
+            p = Path(filepath)
+            table_name = p.stem.split('.')[0] # Extrahiert den Tabellennamen aus dem Dateinamen
+            
+            if p.suffix == ".csv":
+                import_from_csv(table_name, filepath)
+            elif p.suffix == ".json":
+                import_from_json(table_name, filepath)
+            else:
+                QMessageBox.warning(self, "Fehler", "Nicht unterstützter Dateityp.")
+                return
+
+            QMessageBox.information(self, "Erfolg", f"Daten wurden erfolgreich in '{table_name}' importiert.")
+            self.data_imported.emit() # Signal senden, um die UI zu aktualisieren
+
+        except Exception as e:
+            QMessageBox.critical(self, "Importfehler", f"Ein Fehler ist aufgetreten:\n{e}")
+
+
 
 
 # ---------------------------------------------------------
@@ -277,6 +319,7 @@ class ProductListPanel(QFrame):
         # Signal verbinden
         self.add_product_btn.clicked.connect(self.open_add_product_dialog)
 
+
     def populate_tabs(self, search_term=None):
         """Füllt die Tabs mit Daten aus der Datenbank, optional gefiltert."""
         # Zuordnung von Tab-Namen zu Datenbank-Tabellen
@@ -347,6 +390,9 @@ class ProductListPanel(QFrame):
                     item.setForeground(QColor("black")) # Schriftfarbe auf Schwarz setzen
                     table_widget.setItem(row_idx, col_idx, item)
             
+            table_widget.cellClicked.connect(self.handle_product_click)
+            table_widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+            table_widget.setEditTriggers(QAbstractItemView.NoEditTriggers)
             layout.addWidget(table_widget)
     
     def open_add_product_dialog(self):
@@ -375,6 +421,71 @@ class ProductListPanel(QFrame):
                 self.populate_tabs() # Tabs neu laden
             except Exception as e:
                 QMessageBox.critical(self, "Datenbankfehler", f"Fehler beim Hinzufügen des Produkts:\n{e}")
+
+    def handle_product_click(self, row, column):
+        """Löscht das ausgewählte Produkt aus der Datenbank."""
+        # Aktuellen Tab und Tabelle ermitteln
+        current_tab_widget = self.tabs.currentWidget()
+        if not current_tab_widget or not hasattr(current_tab_widget, 'layout') or not current_tab_widget.layout():
+            return
+
+        table_widget = current_tab_widget.findChild(QTableWidget)
+        if not table_widget:
+            # This should not happen if the signal is connected correctly
+            return
+
+        # Annahme: Die erste Spalte ist die Seriennummer, aber wir suchen den Header
+        headers = [table_widget.horizontalHeaderItem(i).text() for i in range(table_widget.columnCount())]
+        try:
+            sn_col_index = headers.index("seriennummer")
+        except ValueError:
+            QMessageBox.critical(self, "Fehler", "Die Spalte 'seriennummer' wurde nicht gefunden.")
+            return
+
+        serial_number_item = table_widget.item(row, sn_col_index)
+        if not serial_number_item:
+            return
+
+        serial_number = serial_number_item.text()
+        
+        # Tabellennamen ermitteln
+        tab_map = {
+            "Cases": "cases", "Grafikkarten": "grafikkarten", "Prozessoren": "prozessoren",
+            "Mainboards": "mainboards", "Arbeitsspeicher": "arbeitsspeicher",
+            "Festplatten": "festplatten", "Netzteile": "netzteile",
+            "Kühler": "kuehler", "Zubehör": "zubehoer"
+        }
+        current_tab_text = self.tabs.tabText(self.tabs.currentIndex())
+        table_name = tab_map.get(current_tab_text)
+
+        if not table_name:
+            return
+
+        # Bestätigungsdialog
+        reply = QMessageBox.question(
+            self,
+            "Löschen bestätigen",
+            f"Möchten Sie das Produkt mit der Seriennummer '{serial_number}' wirklich löschen?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        if reply == QMessageBox.Yes:
+            try:
+                delete(table_name, "seriennummer", serial_number)
+                QMessageBox.information(self, "Erfolg", "Das Produkt wurde erfolgreich gelöscht.")
+                
+                # UI aktualisieren
+                self.populate_tabs()
+                
+                # Das config_panel über das Hauptfenster aktualisieren
+                main_window = self.parent().parent()
+                if hasattr(main_window, 'config_panel'):
+                    main_window.config_panel.fill_in_dropdowns_from_db()
+
+            except Exception as e:
+                QMessageBox.critical(self, "Datenbankfehler", f"Fehler beim Löschen des Produkts:\n{e}")
+
 
 # ---------------------------------------------------------
 # 4. DIALOG ZUM HINZUFÜGEN VON PRODUKTEN
@@ -500,6 +611,10 @@ class UnifiedWindow(QMainWindow):
         self.menu_panel.all_products_button.clicked.connect(
             self.config_panel.fill_in_dropdowns_from_db
         )
+
+        # Signal für Datenimport verbinden
+        self.menu_panel.data_imported.connect(self.product_panel.populate_tabs)
+        self.menu_panel.data_imported.connect(self.config_panel.fill_in_dropdowns_from_db)
 
     def handle_search(self, text):
         """Wird aufgerufen, wenn sich der Text in der Suchleiste ändert."""
